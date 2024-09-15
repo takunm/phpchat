@@ -1,51 +1,40 @@
 <?php
 session_start();
 
-
 $chatHistory = [];
 $chatFilePath = 'chat_history.txt';
-
 
 if (file_exists($chatFilePath)) {
     $chatHistory = json_decode(file_get_contents($chatFilePath), true);
 }
 
-
 if (isset($_POST['register'])) {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-
     $usersFilePath = 'users.txt';
     $users = [];
-
 
     if (file_exists($usersFilePath)) {
         $users = json_decode(file_get_contents($usersFilePath), true);
     }
 
-
     $users[$username] = ['password' => $password];
     file_put_contents($usersFilePath, json_encode($users));
 
-
     echo '新規登録が完了しました。';
 }
-
 
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-
     $usersFilePath = 'users.txt';
     $users = [];
-
 
     if (file_exists($usersFilePath)) {
         $users = json_decode(file_get_contents($usersFilePath), true);
     }
-
 
     if (isset($users[$username]) && password_verify($password, $users[$username]['password'])) {
         $_SESSION['username'] = $username;
@@ -53,7 +42,6 @@ if (isset($_POST['login'])) {
         echo 'ユーザー名またはパスワードが正しくありません。';
     }
 }
-
 
 if (isset($_POST['delete'])) {
     echo '本当に削除してもよろしいですか？';
@@ -64,45 +52,35 @@ if (isset($_POST['delete'])) {
     echo '</form>';
 }
 
-
 if (isset($_POST['confirmDelete'])) {
     $deletedUsername = $_SESSION['username'];
     unset($_SESSION['username']);
 
-
     $usersFilePath = 'users.txt';
     $users = [];
-
 
     if (file_exists($usersFilePath)) {
         $users = json_decode(file_get_contents($usersFilePath), true);
     }
-
 
     if (isset($users[$deletedUsername])) {
         unset($users[$deletedUsername]);
         file_put_contents($usersFilePath, json_encode($users));
     }
 
-
     file_put_contents($chatFilePath, '');
-
 
     echo 'アカウントが削除されました。';
 }
-
 
 if (isset($_POST['message']) && isset($_SESSION['username'])) {
     $message = $_POST['message'];
     $username = $_SESSION['username'];
 
-
     $chatHistory[] = ['username' => $username, 'message' => $message];
-
 
     file_put_contents($chatFilePath, json_encode($chatHistory));
 }
-
 
 if (!isset($_SESSION['username'])) {
     ?>
